@@ -27,8 +27,8 @@ const pageSchema = {
 };
 const quick = services.filter((s) => s.urgent);
 ---
-<BaseLayout title={a.metaTitle} description={a.metaDescription} schema={[breadcrumbSchema(crumbs), pageSchema]}>
-  <PageHero title={`מנעולן ${a.nameIn}`} lead={a.intro} crumbs={crumbs}>
+<BaseLayout title={a.metaTitle} description={a.metaDescription} schema={[breadcrumbSchema(crumbs), pageSchema]} ogImage={a.image}>
+  <PageHero title={`מנעולן ${a.nameIn}`} lead={a.intro} crumbs={crumbs} image={a.image} imageAlt={a.imageAlt}>
     <div class="eta-box">
       <span class="eta-num">{a.eta.min}-{a.eta.max}</span>
       <span class="eta-txt">דקות הגעה טיפוסיות {a.nameIn}, גם בלילה</span>

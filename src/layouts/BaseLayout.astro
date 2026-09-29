@@ -3,6 +3,7 @@ import '@fontsource-variable/noto-sans-hebrew/standard.css';
 import '../styles/global.css';
 import fontHebrew from '@fontsource-variable/noto-sans-hebrew/files/noto-sans-hebrew-hebrew-standard-normal.woff2?url';
 
+import DemoBanner from '../components/DemoBanner.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import MobileBar from '../components/MobileBar.astro';
@@ -99,6 +100,7 @@ const allSchema = [businessSchema, ...schema];
   </head>
   <body>
     <a class="skip-link" href="#main">דלגו לתוכן הראשי</a>
+    <DemoBanner />
     <Header />
     <main id="main">
       <slot />

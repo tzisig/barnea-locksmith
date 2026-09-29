@@ -18,5 +18,10 @@ All photos are from [Pexels](https://www.pexels.com/license/) (free to use, no a
 | owner-34286675.jpg | Crab Lens | https://www.pexels.com/photo/34286675/ |
 | workshop-35578808.jpg | muhammeddiler | https://www.pexels.com/photo/35578808/ |
 | jerusalem-6159081.jpg | Karolína Balogová | https://www.pexels.com/photo/6159081/ |
+| area-jerusalem-35651041.jpg | George | https://www.pexels.com/photo/35651041/ |
+| area-mevaseret-zion-33924944.jpg | Mark Direen | https://www.pexels.com/photo/33924944/ |
+| area-beit-shemesh-33924943.jpg | Mark Direen | https://www.pexels.com/photo/33924943/ |
+| area-tzur-hadassah-38130723.jpg | Dua'a Al-Amad | https://www.pexels.com/photo/38130723/ |
+| area-modiin-12748679.jpg | Lio Voo | https://www.pexels.com/photo/12748679/ |
 
-The owner photo is a stock image of an unnamed locksmith; the business and the owner's name are fictional.
+The owner photo is a stock image of an unnamed locksmith; the business and the owner's name are fictional. Area photos show the region (Jerusalem hills, the Latrun area near Modiin) and are not necessarily of the exact town.

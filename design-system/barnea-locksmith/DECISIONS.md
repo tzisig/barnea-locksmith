@@ -25,4 +25,5 @@
 | Signature element: a pin-tumbler cylinder that "unlocks" once on load | frontend-design: spend boldness in one place, one orchestrated moment. It explains the trade, turns the headline's promise into a picture, and renders in its final state with reduced motion or no JavaScript. |
 | Services as an index list, not cards | frontend-design warns against identical rounded cards; a ruled list with icon, one line and a "from" price scans faster. |
 | Middle dots removed from review metadata | frontend-design flags "A · B · C" meta strings as template chrome. |
-| Area pages have no photos | Pexels has no usable photos of Mevaseret Zion, Tzur Hadassah, Beit Shemesh or Modiin, and a photo of the wrong place would mislead. Arrival time is the visual on those pages instead. |
+| Striped yellow demo banner on every page | Owner's rule for portfolio demos: it must be obvious that everything is fictional. It renders only while `site.isDemo` is true, and its yellow/black stripes sit outside the site palette on purpose, so it never reads as part of the design. |
+| Area photos show the region, not always the exact town | Portfolio demo: stock photos of the Jerusalem hills stand in until a client supplies real ones. |

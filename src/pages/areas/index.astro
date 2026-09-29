@@ -1,4 +1,5 @@
 ---
+import { Picture } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import AreaEta from '../../components/AreaEta.astro';
@@ -17,6 +18,7 @@ const crumbs = [home, { label: 'אזורי שירות', href: '/areas/' }];
     <div class="wrap grid">
       {areas.map((a) => (
         <article class="area reveal">
+          <div class="media"><Picture src={a.image} alt={a.imageAlt} widths={[400, 700]} sizes="(min-width: 900px) 30vw, 100vw" formats={['avif', 'webp']} loading="lazy" /></div>
           <h2><a href={`/areas/${a.slug}/`}>מנעולן {a.nameIn}</a></h2>
           <p class="eta">{a.eta.min}-{a.eta.max} דקות הגעה</p>
           <p>{a.intro}</p>
@@ -32,7 +34,8 @@ const crumbs = [home, { label: 'אזורי שירות', href: '/areas/' }];
   .eta-sec { border-top: 1px solid var(--c-night-line); }
   .narrow-eta { max-width: 820px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s-6); }
-  .area { border-top: 3px solid var(--c-alert); padding-top: var(--s-4); display: grid; gap: var(--s-3); align-content: start; }
+  .area { display: grid; gap: var(--s-3); align-content: start; }
+  .area .media { aspect-ratio: 16 / 10; border-bottom: 3px solid var(--c-alert); margin-bottom: var(--s-2); }
   .area h2 { font-size: var(--t-h3); }
   .area h2 a { color: var(--c-ink); }
   .eta { font-weight: 800; color: var(--c-signal); }

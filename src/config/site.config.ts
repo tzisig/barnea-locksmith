@@ -27,6 +27,11 @@ import svcSafe from '../assets/img/svc-safe-32334240.jpg';
 import svcSmartLock from '../assets/img/svc-smart-lock-7522609.jpg';
 import svcMasterKey from '../assets/img/svc-master-key-18101862.jpg';
 import svcBurglary from '../assets/img/svc-burglary-792034.jpg';
+import areaJerusalem from '../assets/img/area-jerusalem-35651041.jpg';
+import areaMevaseret from '../assets/img/area-mevaseret-zion-33924944.jpg';
+import areaTzurHadassah from '../assets/img/area-tzur-hadassah-38130723.jpg';
+import areaBeitShemesh from '../assets/img/area-beit-shemesh-33924943.jpg';
+import areaModiin from '../assets/img/area-modiin-12748679.jpg';
 
 // ---------------------------------------------------------------------------
 // Identity
@@ -52,6 +57,8 @@ export const site = {
    */
   isDemo: true,
   demoNote: 'אתר הדגמה לתיק עבודות. שם העסק, בעל העסק, הפרטים, המחירים והביקורות בדויים. התמונות מ-Pexels.',
+  /** Short line in the striped banner at the top of every page in demo mode. */
+  demoBanner: 'עסק דמיוני לתיק עבודות: השמות, הטלפון, המחירים, הביקורות והתמונות אינם אמיתיים.',
   /** Last review of prices and content (YYYY-MM-DD). Shown on the prices page. */
   contentUpdated: '2026-09-28',
 };
@@ -585,6 +592,9 @@ export type Area = {
   slug: string;
   name: string;
   nameIn: string;
+  /** Demo photos are stock images of the region, not necessarily of this exact town. */
+  image: ImageMetadata;
+  imageAlt: string;
   /** Typical arrival window in minutes from the base in Talpiot. Used by the estimator. */
   eta: { min: number; max: number };
   neighborhoods: string[];
@@ -600,6 +610,8 @@ export const areas: Area[] = [
     slug: 'jerusalem',
     name: 'ירושלים',
     nameIn: 'בירושלים',
+    image: areaJerusalem,
+    imageAlt: 'רחוב במרכז ירושלים עם בתי אבן, דקלים ומגדל שעון ביום שמשי',
     eta: ETA.jerusalem,
     neighborhoods: ['תלפיות', 'בקעה', 'קטמונים', 'רחביה', 'נחלאות', 'בית הכרם', 'קריית יובל', 'גילה', 'רמות', 'פסגת זאב', 'הר נוף', 'ארנונה', 'מקור ברוך', 'גבעת שאול'],
     metaTitle: `מנעולן בירושלים 24/7, מגיע תוך ${etaText(ETA.jerusalem)}`,
@@ -621,6 +633,8 @@ export const areas: Area[] = [
     slug: 'mevaseret-zion',
     name: 'מבשרת ציון',
     nameIn: 'במבשרת ציון',
+    image: areaMevaseret,
+    imageAlt: 'בתי יישוב על מדרון ירוק בין שדות פורחים והרים',
     eta: ETA['mevaseret-zion'],
     neighborhoods: ['מעוז ציון', 'שכונת הרכס', 'שכונת הגבעה', 'השכונה החדשה', 'מרכז מבשרת'],
     metaTitle: `מנעולן במבשרת ציון, מגיע תוך ${etaText(ETA['mevaseret-zion'])}`,
@@ -641,6 +655,8 @@ export const areas: Area[] = [
     slug: 'tzur-hadassah',
     name: 'צור הדסה',
     nameIn: 'בצור הדסה',
+    image: areaTzurHadassah,
+    imageAlt: 'גבעות ירוקות עם עצים ושבילי עפר תחת שמיים כחולים',
     eta: ETA['tzur-hadassah'],
     neighborhoods: ['צור הדסה', 'מבוא ביתר', 'נס הרים', 'בר גיורא'],
     metaTitle: 'מנעולן בצור הדסה והיישובים הסמוכים',
@@ -661,6 +677,8 @@ export const areas: Area[] = [
     slug: 'beit-shemesh',
     name: 'בית שמש',
     nameIn: 'בבית שמש',
+    image: areaBeitShemesh,
+    imageAlt: 'עיר על גבעה מוקפת שדות ירוקים ופריחה לבנה',
     eta: ETA['beit-shemesh'],
     neighborhoods: ['רמת בית שמש א', 'רמת בית שמש ג', 'גבעת שרת', 'שכונת הנרקיסים', 'מרכז העיר', 'משכנות יעקב'],
     metaTitle: 'מנעולן בבית שמש, כולל רמת בית שמש',
@@ -681,6 +699,8 @@ export const areas: Area[] = [
     slug: 'modiin',
     name: 'מודיעין',
     nameIn: 'במודיעין',
+    image: areaModiin,
+    imageAlt: 'מבט מהאוויר על מנזר לטרון והשדות שבין מודיעין לבית שמש',
     eta: ETA.modiin,
     neighborhoods: ['מוריה', 'אבני חן', 'הנביאים', 'מרכז העיר', 'שבטים', 'הציפורים', 'בוכמן', 'משכית'],
     metaTitle: 'מנעולן במודיעין, מנעולים חכמים ודלתות ביטחון',

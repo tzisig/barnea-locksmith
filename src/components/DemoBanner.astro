@@ -1,0 +1,20 @@
+---
+// Visible demo notice on every page while site.isDemo is true. Remove nothing by hand: set isDemo to false.
+import { site } from '../config/site.config';
+---
+{site.isDemo && (
+  <div class="demo-banner" role="note" aria-label="אתר הדגמה">
+    <p><strong>אתר הדגמה.</strong> <span>{site.demoBanner}</span></p>
+  </div>
+)}
+
+<style>
+  .demo-banner {
+    background: repeating-linear-gradient(-45deg, #FACC15 0 14px, #EAB308 14px 28px);
+    color: #0A0E27; text-align: center; font-size: 0.9375rem; line-height: 1.4;
+    padding: 6px var(--gutter); border-bottom: 2px solid #0A0E27;
+  }
+  .demo-banner p { max-width: var(--max); margin: 0 auto; }
+  .demo-banner span { background: rgb(255 255 255 / 0.75); padding: 1px 6px; border-radius: 3px; }
+  .demo-banner strong { background: #0A0E27; color: #FACC15; padding: 1px 8px; border-radius: 3px; margin-inline-end: 4px; }
+</style>

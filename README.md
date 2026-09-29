@@ -2,7 +2,7 @@
 
 Static Astro site, Hebrew RTL, built so the same code can be offered to another locksmith (or a similar on-call trade) by editing one file.
 
-This is a **portfolio demo**: the business, the owner, prices, reviews and contact details are fictional, and photos are Pexels stock (see `CREDITS.md`). Demo mode adds `noindex` to every page, `public/_headers` sends `X-Robots-Tag: noindex`, and the footer says so.
+This is a **portfolio demo**: the business, the owner, prices, reviews and contact details are fictional, and photos are Pexels stock (see `CREDITS.md`). Demo mode shows a striped "demo site" banner at the top of every page, adds `noindex` to every page, `public/_headers` sends `X-Robots-Tag: noindex`, and the footer says so.
 
 ## New client in 4 steps
 
