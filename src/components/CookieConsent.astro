@@ -1,0 +1,26 @@
+---
+// Consent banner. Analytics (GA4) loads only after the visitor accepts. Hidden when no GA4 id is set.
+interface Props { ga4?: string }
+const { ga4 = '' } = Astro.props;
+---
+{ga4 && (
+  <div class="consent" role="region" aria-label="הסכמה לעוגיות" hidden data-consent data-ga4={ga4}>
+    <p>האתר משתמש בעוגיות חיוניות, ובהסכמתכם גם בעוגיות מדידה לשיפור השירות. <a href="/privacy/">מדיניות פרטיות</a></p>
+    <div class="buttons">
+      <button type="button" class="btn btn--alert" data-consent-accept>מאשר</button>
+      <button type="button" class="btn btn--line" data-consent-reject>רק חיוניות</button>
+    </div>
+  </div>
+)}
+
+<style>
+  .consent {
+    position: fixed; z-index: 95; inset-inline: 12px; bottom: calc(var(--mobile-bar) + 12px + env(safe-area-inset-bottom));
+    max-width: 30rem; padding: var(--s-5); border-radius: var(--radius);
+    background: var(--c-night-2); color: var(--c-on-night); border: 1px solid var(--c-night-line); font-size: 0.9375rem;
+  }
+  .consent a { color: var(--c-signal-on-night); }
+  .buttons { display: flex; gap: var(--s-3); flex-wrap: wrap; margin-top: var(--s-4); }
+  .buttons .btn--line { color: var(--c-on-night); }
+  @media (min-width: 900px) { .consent { bottom: 24px; inset-inline-start: auto; } }
+</style>

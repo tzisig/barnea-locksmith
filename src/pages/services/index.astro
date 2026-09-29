@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ServiceList from '../../components/ServiceList.astro';
+import Estimator from '../../components/Estimator.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site, services, images } from '../../config/site.config';
+import { breadcrumbSchema, home, abs } from '../../lib/schema';
+
+const crumbs = [home, { label: 'שירותים', href: '/services/' }];
+const list = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: services.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: s.title, url: abs(`/services/${s.slug}/`) })),
+};
+---
+<BaseLayout title="שירותי מנעולן בירושלים והסביבה" description={`כל שירותי המנעולנות של ${site.name}: פתיחת דלתות, החלפת צילינדר, דלתות ביטחון, רכבים, כספות, מנעולים חכמים, מאסטר ושדרוג אחרי פריצה.`} schema={[breadcrumbSchema(crumbs), list]}>
+  <PageHero title="שירותי מנעולנות" lead="כל שירות מתומחר מראש, עם טווח מחיר כתוב והסבר מה כלול. אם לא בטוחים מה צריך, מתקשרים ומתארים מה קרה." crumbs={crumbs} image={images.keyMachine} imageAlt={images.keyMachineAlt} />
+  <section class="section">
+    <div class="wrap"><ServiceList list={services} headingLevel="h2" /></div>
+  </section>
+  <section class="section section--card">
+    <div class="wrap narrow-est"><Estimator /></div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .narrow-est { max-width: 900px; }
+</style>

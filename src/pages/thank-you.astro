@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { contact, telUrl } from '../config/site.config';
+import { home } from '../lib/schema';
+
+const crumbs = [home, { label: 'תודה', href: '/thank-you/' }];
+---
+<BaseLayout title="תודה, קיבלנו" description="הפנייה התקבלה." noindex>
+  <PageHero title="תודה, קיבלנו את הפנייה" lead="עידו יחזור אליכם בהקדם. אם אתם נעולים בחוץ עכשיו, אל תחכו: התקשרו." crumbs={crumbs}>
+    <div class="actions">
+      <a class="btn btn--alert" href={telUrl}><Icon name="phone" /><span class="ltr">{contact.phone}</span></a>
+      <a class="btn btn--line" href="/">לדף הבית</a>
+    </div>
+  </PageHero>
+</BaseLayout>
+
+<style>
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-6); }
+</style>

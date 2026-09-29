@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { contact, site, telUrl, whatsappUrl } from '../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../lib/schema';
+
+const crumbs = [home, { label: 'צור קשר', href: '/contact/' }];
+const contactSchema = { '@context': 'https://schema.org', '@type': 'ContactPage', url: abs('/contact/'), about: businessRef };
+---
+<BaseLayout title="צור קשר" description={`צרו קשר עם ${site.name}: טלפון, וואטסאפ או טופס. ${contact.availabilityLabel}.`} schema={[breadcrumbSchema(crumbs), contactSchema]}>
+  <PageHero title="צור קשר" lead="נעולים עכשיו? עדיף להתקשר. לכל השאר, הטופס מספיק ונחזור אליכם." crumbs={crumbs} />
+  <section class="section">
+    <div class="wrap grid">
+      <div class="form-card">
+        <h2 class="mb">השאירו פרטים</h2>
+        <ContactForm />
+      </div>
+      <aside class="info night">
+        <h2 class="mb">או ישירות</h2>
+        <a class="btn btn--alert" href={telUrl}><Icon name="phone" /><span class="ltr">{contact.phone}</span></a>
+        <a class="btn btn--wa" href={whatsappUrl()} target="_blank" rel="noopener"><Icon name="whatsapp" /><span>וואטסאפ</span><span class="visually-hidden">(נפתח בחלון חדש)</span></a>
+        <p><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+        <h3>שעות ותעריפים</h3>
+        <ul>{contact.hours.map((h) => <li><strong>{h.days}:</strong> {h.time}</li>)}</ul>
+        <p class="muted">{contact.responsePromise}.</p>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s-7); align-items: start; }
+  .form-card { background: var(--c-card); border: 1px solid var(--c-line); border-radius: 12px; padding: clamp(var(--s-5), 4vw, var(--s-7)); }
+  .mb { margin-bottom: var(--s-5); font-size: var(--t-h3); }
+  .info { border-radius: 12px; padding: var(--s-6); display: grid; gap: var(--s-3); }
+  .info h3 { margin-top: var(--s-4); font-size: 1.125rem; }
+  .info ul { list-style: none; display: grid; gap: var(--s-2); font-size: 1rem; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+</style>

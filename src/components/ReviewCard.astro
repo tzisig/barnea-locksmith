@@ -1,0 +1,27 @@
+---
+import { areaBySlug, serviceBySlug, formatDate, type Review } from '../config/site.config';
+interface Props { review: Review }
+const { review: r } = Astro.props;
+const area = areaBySlug(r.area);
+const svc = serviceBySlug(r.service);
+---
+<figure class="review">
+  <p class="stars" role="img" aria-label={`דירוג ${r.rating} מתוך 5`}>
+    {Array.from({ length: 5 }, (_, i) => <span aria-hidden="true" class:list={{ off: i >= r.rating }}>★</span>)}
+  </p>
+  <blockquote><p>{r.text}</p></blockquote>
+  <figcaption>
+    <strong>{r.name}</strong>
+    <span>{svc?.navTitle}{area ? `, ${area.name}` : ''}</span>
+    <span><time datetime={r.date}>{formatDate(r.date)}</time></span>
+  </figcaption>
+</figure>
+
+<style>
+  .review { margin: 0; padding: var(--s-5); background: var(--c-card); border: 1px solid var(--c-line); border-inline-start: 4px solid var(--c-alert); border-radius: var(--radius); display: grid; gap: var(--s-3); align-content: start; }
+  .stars { color: #B45309; letter-spacing: 2px; font-size: 1.125rem; line-height: 1; }
+  .stars .off { color: #CBD5E1; }
+  blockquote { margin: 0; }
+  figcaption { display: grid; gap: 2px; font-size: 0.9375rem; }
+  figcaption span { color: var(--c-muted); }
+</style>

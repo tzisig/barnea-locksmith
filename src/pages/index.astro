@@ -1,0 +1,207 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import LockHero from '../components/LockHero.astro';
+import ServiceList from '../components/ServiceList.astro';
+import Estimator from '../components/Estimator.astro';
+import TechCard from '../components/TechCard.astro';
+import AreaEta from '../components/AreaEta.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, hero, images, contact, stats, services, trustPoints, processSteps, reviews, faqs, guide, telUrl, whatsappUrl } from '../config/site.config';
+import { faqSchema } from '../lib/schema';
+
+const description = `${site.name}: מנעולן בירושלים, מבשרת, בית שמש ומודיעין. פתיחת דלתות בלי נזק, החלפת צילינדר, רכבים וכספות. מחיר מלא מראש, זמינים 24/7.`;
+---
+<BaseLayout title={`מנעולן בירושלים 24/7 | ${site.name}`} description={description} schema={[faqSchema(faqs)]}>
+  <section class="hero night" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true">
+      <Picture src={images.hero} alt="" widths={[640, 1024, 1600, 2000]} sizes="100vw" formats={['avif', 'webp']} loading="eager" fetchpriority="high" />
+    </div>
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="kicker"><Icon name="pin" size={18} />{site.region}</p>
+        <h1 id="hero-title"><span>{hero.title}</span> <span class="line2">{hero.titleLine2}</span></h1>
+        <p class="lead">{hero.lead}</p>
+        <div class="hero-actions">
+          <a class="btn btn--alert" href={telUrl}><Icon name="phone" /><span>חייגו <span class="ltr">{contact.phone}</span></span></a>
+          <a class="btn btn--wa" href={whatsappUrl()} target="_blank" rel="noopener"><Icon name="whatsapp" /><span>וואטסאפ</span><span class="visually-hidden">(נפתח בחלון חדש)</span></a>
+        </div>
+        <ul class="hero-facts">
+          <li><strong>{stats.rating}</strong><span>מתוך 5, {stats.reviewCount} ביקורות</span></li>
+          <li><strong>{stats.noDamage}%</strong><span>נפתחות בלי נזק</span></li>
+          <li><strong>{stats.years}</strong><span>שנים בירושלים</span></li>
+        </ul>
+      </div>
+      <LockHero />
+    </div>
+  </section>
+
+  <section class="section trust" aria-labelledby="trust-title">
+    <div class="wrap">
+      <h2 id="trust-title" class="visually-hidden">למה אפשר לסמוך עלינו</h2>
+      <ul class="trust-grid">
+        {trustPoints.map((t, i) => (
+          <li class="reveal" style={`--i:${i}`}>
+            <span class="t-ico"><Icon name={t.icon} size={26} /></span>
+            <h3>{t.title}</h3>
+            <p>{t.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--card" aria-labelledby="svc-title">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <h2 id="svc-title">מה עושים</h2>
+          <p class="muted">מפתיחת דלת שנטרקה ועד מערכת מפתח מאסטר לבניין שלם.</p>
+        </div>
+        <a class="link-arrow" href="/services/">כל השירותים <Icon name="arrow" size={18} /></a>
+      </div>
+      <ServiceList list={services} />
+    </div>
+  </section>
+
+  <section class="section" aria-label="מחשבון מחיר">
+    <div class="wrap est-wrap">
+      <Estimator />
+      <aside class="est-side">
+        <h2 class="h3">למה המחיר כתוב באתר?</h2>
+        <p>כי בתחום הזה הרבה מודעות מבטיחות "החל מ-50 ₪", והמחיר האמיתי מתגלה רק אחרי שהדלת כבר פתוחה. אצלנו תראו טווח אמיתי כבר עכשיו, ותשמעו מחיר מדויק בטלפון.</p>
+        <a class="link-arrow" href="/prices/">טבלת המחירים המלאה <Icon name="arrow" size={18} /></a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section night steps" aria-labelledby="steps-title">
+    <div class="wrap steps-grid">
+      <div>
+        <h2 id="steps-title">מה קורה אחרי שמתקשרים</h2>
+        <ol class="step-list">
+          {processSteps.map((s, i) => (
+            <li class="reveal" style={`--i:${i}`}>
+              <span class="num" aria-hidden="true">{i + 1}</span>
+              <div><h3>{s.title}</h3><p class="muted">{s.text}</p></div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <TechCard />
+    </div>
+  </section>
+
+  <section class="section night areas" aria-labelledby="areas-title">
+    <div class="wrap areas-grid">
+      <div>
+        <h2 id="areas-title">כמה זמן ייקח לנו להגיע</h2>
+        <p class="lead">הרכב יוצא מ{contact.baseArea}. בזמן אמת, תשמעו זמן מדויק בטלפון.</p>
+        <a class="link-arrow" href="/areas/">כל אזורי השירות <Icon name="arrow" size={18} /></a>
+      </div>
+      <AreaEta />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="reviews-title">
+    <div class="wrap">
+      <div class="head">
+        <div>
+          <h2 id="reviews-title">מה אומרים לקוחות</h2>
+          <p class="muted">{stats.rating} מתוך 5, לפי {stats.reviewCount} ביקורות ב-{stats.reviewSource}.</p>
+        </div>
+        <a class="link-arrow" href="/reviews/">כל הביקורות <Icon name="arrow" size={18} /></a>
+      </div>
+      <div class="reviews">{reviews.slice(0, 3).map((r) => <ReviewCard review={r} />)}</div>
+    </div>
+  </section>
+
+  <section class="section section--card guide-teaser" aria-labelledby="guide-title">
+    <div class="wrap guide-grid">
+      <div class="media reveal">
+        <Picture src={images.workshop} alt={images.workshopAlt} widths={[480, 800, 1100]} sizes="(min-width: 900px) 45vw, 100vw" formats={['avif', 'webp']} loading="lazy" />
+      </div>
+      <div>
+        <h2 id="guide-title">{guide.title}</h2>
+        <p class="lead">{guide.lead}</p>
+        <ul class="ticks">{guide.redFlags.slice(0, 3).map((f) => <li><strong>{f.title}.</strong> {f.text}</li>)}</ul>
+        <a class="btn btn--line" href="/guide/">למדריך המלא</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="wrap narrow">
+      <h2 id="faq-title">שאלות נפוצות</h2>
+      <FaqList items={faqs} />
+      <p class="more"><a href="/faq/">עוד שאלות ותשובות</a></p>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .hero { position: relative; overflow: hidden; padding-block: clamp(var(--s-7), 7vw, var(--s-9)); }
+  .hero-bg { position: absolute; inset: 0; }
+  .hero-bg :global(picture), .hero-bg :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to left, rgb(10 14 39 / 0.97) 0%, rgb(10 14 39 / 0.9) 45%, rgb(10 14 39 / 0.72) 100%); }
+  .hero-grid { position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--s-8); align-items: center; }
+  .kicker { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--c-alert-on-night); margin-bottom: var(--s-4); }
+  .hero h1 { font-size: var(--t-display); font-weight: 900; font-stretch: 62.5%; line-height: 0.98; }
+  .hero h1 span { display: block; }
+  .line2 { color: var(--c-open); }
+  .hero .lead { margin-top: var(--s-5); font-size: 1.1875rem; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-6); }
+  .hero-facts { list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-5) var(--s-7); margin-top: var(--s-7); padding-top: var(--s-5); border-top: 1px solid var(--c-night-line); }
+  .hero-facts li { display: grid; }
+  .hero-facts strong { font-size: 2rem; font-weight: 900; font-stretch: 75%; line-height: 1; }
+  .hero-facts span { font-size: 0.9375rem; color: var(--c-on-night-muted); margin-top: 4px; }
+
+  .trust { padding-block: var(--s-7); }
+  .trust-grid { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-6); }
+  .trust-grid li { display: grid; gap: var(--s-2); align-content: start; }
+  .t-ico { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--c-alert); color: var(--c-alert); margin-bottom: var(--s-2); }
+  .trust-grid h3 { font-size: 1.25rem; }
+  .trust-grid p { color: var(--c-muted); font-size: 1rem; }
+
+  .est-wrap { display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--s-7); align-items: start; }
+  .est-side { display: grid; gap: var(--s-4); padding-top: var(--s-5); }
+  .h3 { font-size: var(--t-h3); }
+
+  .steps-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: var(--s-8); align-items: center; }
+  .step-list { list-style: none; display: grid; gap: var(--s-5); margin-top: var(--s-6); }
+  .step-list li { display: grid; grid-template-columns: 48px 1fr; gap: var(--s-4); align-items: start; }
+  .num { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; background: var(--c-alert); color: #fff; font-weight: 900; font-size: 1.25rem; }
+  .step-list h3 { font-size: 1.25rem; margin-bottom: 2px; }
+
+  .areas { border-top: 1px solid var(--c-night-line); }
+  .areas-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: var(--s-8); align-items: center; }
+  .areas .lead { margin-block: var(--s-4); }
+
+  .reviews { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-5); }
+
+  .guide-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: var(--s-8); align-items: center; }
+  .guide-grid .media { aspect-ratio: 4 / 3; }
+  .guide-grid .lead { margin-block: var(--s-4) var(--s-5); }
+  .guide-grid .btn { margin-top: var(--s-6); }
+
+  .narrow { max-width: 860px; }
+  .narrow h2 { margin-bottom: var(--s-5); }
+  .more { margin-top: var(--s-5); font-weight: 700; }
+
+  @media (max-width: 1000px) {
+    .hero-grid, .est-wrap, .steps-grid, .areas-grid, .guide-grid { grid-template-columns: 1fr; gap: var(--s-7); }
+    .trust-grid { grid-template-columns: 1fr 1fr; }
+    .reviews { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .trust-grid { grid-template-columns: 1fr; gap: var(--s-5); }
+    .hero-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); }
+    .hero-facts strong { font-size: 1.625rem; }
+    .hero-facts span { font-size: 0.8125rem; }
+  }
+</style>

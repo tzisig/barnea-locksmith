@@ -1,0 +1,25 @@
+---
+import Icon from './Icon.astro';
+import { contact, telUrl, whatsappUrl } from '../config/site.config';
+interface Props { title?: string; text?: string; waText?: string }
+const { title = 'נעולים בחוץ, או רוצים לנעול טוב יותר?', text = `${contact.availabilityLabel}. מחיר מלא בטלפון, לפני שיוצאים.`, waText } = Astro.props;
+---
+<section class="cta night" aria-labelledby="cta-title">
+  <div class="wrap inner">
+    <div>
+      <h2 id="cta-title">{title}</h2>
+      <p class="lead">{text}</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn--alert" href={telUrl}><Icon name="phone" /><span>חייגו <span class="ltr">{contact.phone}</span></span></a>
+      <a class="btn btn--wa" href={whatsappUrl(waText)} target="_blank" rel="noopener"><Icon name="whatsapp" /><span>וואטסאפ</span><span class="visually-hidden">(נפתח בחלון חדש)</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { padding-block: var(--s-8); border-top: 1px solid var(--c-night-line); }
+  .inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-6); }
+  .lead { margin-top: var(--s-3); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+</style>

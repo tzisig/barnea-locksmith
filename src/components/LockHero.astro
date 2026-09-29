@@ -1,0 +1,104 @@
+---
+// Signature element: a pin-tumbler cylinder in cross-section. On load the key slides in, every pin
+// stack rises to the shear line, and the status turns to "open". One orchestrated moment; with
+// reduced motion it renders straight in the open state. Purely illustrative, hidden from screen readers.
+
+// Key pin heights. The key cut under each chamber is derived from them, so the drawing stays consistent.
+const keyPins = [34, 46, 28, 52, 40];
+const xs = [96, 148, 200, 252, 304];
+const PIN_W = 24;
+const REST = 165; // bottom of a pin stack when there is no key
+const SHEAR = 110;
+const DRIVER = 38;
+const SPRING_TOP = 30;
+
+const stacks = keyPins.map((hk, i) => {
+  const lift = REST - hk - SHEAR; // how far the stack rises so the key pin top meets the shear line
+  const driverTop = REST - hk - DRIVER;
+  const springLen = driverTop - SPRING_TOP;
+  const springOpen = springLen - lift;
+  const zig = Array.from({ length: 7 }, (_, k) => `${k % 2 ? xs[i] + 4 : xs[i] + PIN_W - 4},${SPRING_TOP + (springLen * (k + 1)) / 8}`).join(' ');
+  return { x: xs[i], hk, lift, driverTop, springLen, scale: springOpen / springLen, zig };
+});
+
+// Key blade outline: the top edge dips to (SHEAR + hk) under each chamber
+const cut = stacks.flatMap((s) => [`${s.x - 6},136`, `${s.x + 4},${SHEAR + s.hk}`, `${s.x + PIN_W - 4},${SHEAR + s.hk}`, `${s.x + PIN_W + 6},136`]);
+const blade = ['70,136', ...cut, '352,136', '352,178', '78,178', '62,160'].join(' ');
+---
+<figure class="lock-panel" aria-hidden="true">
+  <div class="status">
+    <span class="state state--locked"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>נעול</span>
+    <span class="state state--open"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7a4 4 0 0 1 7.5-2"/></svg>פתוח, בלי נזק</span>
+  </div>
+  <svg class="cyl" viewBox="0 0 400 200">
+    <rect class="shell" x="40" y="20" width="320" height="90" rx="10" />
+    <rect class="plug" x="40" y="110" width="320" height="76" rx="10" />
+    <line class="shear" x1="40" y1="110" x2="360" y2="110" />
+    {stacks.map((s, i) => (
+      <g style={`--lift:${-s.lift}px; --scale:${s.scale.toFixed(3)}; --d:${i * 90}ms`}>
+        <rect class="chamber" x={s.x - 3} y={SPRING_TOP - 4} width={PIN_W + 6} height={REST - SPRING_TOP + 6} rx="4" />
+        <polyline class="spring" points={`${s.x + PIN_W / 2},${SPRING_TOP} ${s.zig}`} style={`transform-origin: 0 ${SPRING_TOP}px`} />
+        <g class="stack">
+          <rect class="driver" x={s.x} y={s.driverTop} width={PIN_W} height={DRIVER} rx="3" />
+          <path class="keypin" d={`M${s.x} ${REST - s.hk + 3} q0 -3 3 -3 h${PIN_W - 6} q3 0 3 3 V${REST - 8} L${s.x + PIN_W / 2} ${REST} L${s.x} ${REST - 8} Z`} />
+        </g>
+      </g>
+    ))}
+    <g class="key">
+      <polygon class="blade" points={blade} />
+      <rect class="bow" x="350" y="126" width="46" height="62" rx="14" />
+      <circle class="bow-hole" cx="382" cy="157" r="8" />
+    </g>
+  </svg>
+  <figcaption>ככה נראה צילינדר מבפנים: כשהמפתח הנכון נכנס, כל הפינים מתיישרים על קו החיתוך והמנעול מסתובב.</figcaption>
+</figure>
+
+<style>
+  .lock-panel { margin: 0; background: var(--c-night-2); border: 1px solid var(--c-night-line); border-radius: 12px; padding: var(--s-5); }
+  .status { position: relative; height: 32px; margin-bottom: var(--s-3); font-weight: 800; font-stretch: 87.5%; font-size: 1.0625rem; }
+  .state { position: absolute; inset-inline-start: 0; top: 0; display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; transition: opacity 300ms var(--ease); }
+  .state--locked { color: var(--c-alert-on-night); background: rgb(220 38 38 / 0.14); }
+  .state--open { color: var(--c-open); background: rgb(52 211 153 / 0.14); opacity: 0; }
+  .cyl { width: 100%; height: auto; overflow: visible; }
+  .shell { fill: #1B2150; stroke: var(--c-night-line); }
+  .plug { fill: #232A5E; stroke: var(--c-night-line); }
+  .chamber { fill: var(--c-night); }
+  .shear { stroke: var(--c-alert-on-night); stroke-width: 2; stroke-dasharray: 6 5; transition: stroke 300ms; }
+  .spring { fill: none; stroke: var(--c-on-night-muted); stroke-width: 2; stroke-linejoin: round; }
+  .driver { fill: var(--c-on-night-muted); }
+  .keypin { fill: var(--c-signal-on-night); }
+  .blade { fill: #C9CEDF; }
+  .bow { fill: #C9CEDF; }
+  .bow-hole { fill: var(--c-night-2); }
+  figcaption { margin-top: var(--s-4); font-size: 0.9375rem; color: var(--c-on-night-muted); line-height: 1.55; }
+
+  /* Choreography: key in (0-900ms), stacks rise one by one, then the status flips */
+  :global(.js) .key { transform: translateX(300px); animation: key-in 900ms var(--ease) 400ms forwards; }
+  :global(.js) .stack { animation: lift 420ms var(--ease) calc(1100ms + var(--d)) forwards; }
+  :global(.js) .spring { animation: squeeze 420ms var(--ease) calc(1100ms + var(--d)) forwards; }
+  :global(.js) .shear { animation: shear-open 300ms linear 1900ms forwards; }
+  :global(.js) .state--locked { animation: fade-out 300ms linear 1900ms forwards; }
+  :global(.js) .state--open { animation: fade-in 300ms linear 2000ms forwards; }
+  @keyframes key-in { to { transform: none; } }
+  @keyframes lift { to { transform: translateY(var(--lift)); } }
+  @keyframes squeeze { to { transform: scaleY(var(--scale)); } }
+  @keyframes shear-open { to { stroke: var(--c-open); stroke-dasharray: none; } }
+  @keyframes fade-out { to { opacity: 0; } }
+  @keyframes fade-in { to { opacity: 1; } }
+
+  /* No JS or reduced motion: show the open state, no movement */
+  :global(.no-js) .key, :global(.no-js) .stack, :global(.no-js) .spring { animation: none; }
+  :global(.no-js) .stack { transform: translateY(var(--lift)); }
+  :global(.no-js) .spring { transform: scaleY(var(--scale)); }
+  :global(.no-js) .shear { stroke: var(--c-open); stroke-dasharray: none; }
+  :global(.no-js) .state--locked { opacity: 0; }
+  :global(.no-js) .state--open { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .key { animation: none; transform: none; }
+    :global(.js) .stack { animation: none; transform: translateY(var(--lift)); }
+    :global(.js) .spring { animation: none; transform: scaleY(var(--scale)); }
+    :global(.js) .shear { animation: none; stroke: var(--c-open); stroke-dasharray: none; }
+    :global(.js) .state--locked { animation: none; opacity: 0; }
+    :global(.js) .state--open { animation: none; opacity: 1; }
+  }
+</style>

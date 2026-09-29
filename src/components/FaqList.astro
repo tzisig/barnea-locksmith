@@ -1,0 +1,24 @@
+---
+import type { Faq } from '../config/site.config';
+interface Props { items: Faq[] }
+const { items } = Astro.props;
+---
+<div class="faq">
+  {items.map((f) => (
+    <details>
+      <summary><span>{f.q}</span></summary>
+      <p>{f.a}</p>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq { border-top: 2px solid var(--c-ink); }
+  details { border-bottom: 1px solid var(--c-line); }
+  summary { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); min-height: 60px; padding-block: var(--s-3); cursor: pointer; list-style: none; font-weight: 700; font-size: 1.125rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--c-night); color: #fff; font-weight: 400; font-size: 1.25rem; transition: transform 200ms var(--ease); }
+  details[open] summary::after { transform: rotate(45deg); background: var(--c-alert); }
+  details p { padding-bottom: var(--s-5); max-width: 70ch; color: #334155; }
+  @media (prefers-reduced-motion: reduce) { summary::after { transition: none; } }
+</style>

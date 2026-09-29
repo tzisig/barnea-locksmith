@@ -1,0 +1,44 @@
+---
+// Services as an index list, not a card grid: icon, name, one line, and the "from" price.
+import Icon from './Icon.astro';
+import { formatPrice, type Service } from '../config/site.config';
+interface Props { list: Service[]; headingLevel?: 'h2' | 'h3' }
+const { list, headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+---
+<ul class="svc-list">
+  {list.map((s, i) => (
+    <li class="reveal" style={`--i:${i % 4}`}>
+      <a href={`/services/${s.slug}/`}>
+        <span class="ico"><Icon name={s.icon} size={26} /></span>
+        <span class="txt">
+          <H class="name">{s.title}</H>
+          <span class="short">{s.short}</span>
+        </span>
+        <span class="price">החל מ-{formatPrice(s.price.from)}</span>
+        <span class="go"><Icon name="arrow" size={20} /></span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .svc-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s-7); border-top: 2px solid var(--c-ink); }
+  li { border-bottom: 1px solid var(--c-line); }
+  a { display: grid; grid-template-columns: auto 1fr auto auto; gap: var(--s-4); align-items: center; padding-block: var(--s-5); color: inherit; text-decoration: none; }
+  .ico { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 10px; background: var(--c-night); color: var(--c-alert-on-night); transition: background-color 180ms var(--ease); }
+  .name { font-size: 1.25rem; }
+  .short { display: block; margin-top: 2px; font-size: 0.9375rem; color: var(--c-muted); line-height: 1.5; }
+  .price { font-size: 0.9375rem; font-weight: 700; white-space: nowrap; }
+  .go { color: var(--c-signal); transition: transform 180ms var(--ease); }
+  a:hover .ico { background: var(--c-alert); color: #fff; }
+  a:hover .go { transform: translateX(-4px); }
+  a:hover .name { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+  @media (max-width: 900px) { .svc-list { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) {
+    a { grid-template-columns: auto 1fr; }
+    .price { grid-column: 2; }
+    .go { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { a:hover .go { transform: none; } }
+</style>

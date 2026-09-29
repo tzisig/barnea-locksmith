@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import ServiceList from '../../components/ServiceList.astro';
+import ReviewCard from '../../components/ReviewCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { areas, services, reviewsFor, contact, telUrl, formatPrice, type Area } from '../../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return areas.map((area) => ({ params: { slug: area.slug }, props: { area } }));
+}
+interface Props { area: Area }
+const { area: a } = Astro.props;
+const others = areas.filter((x) => x.slug !== a.slug);
+const areaReviews = reviewsFor({ area: a.slug });
+const crumbs = [home, { label: 'אזורי שירות', href: '/areas/' }, { label: a.name, href: `/areas/${a.slug}/` }];
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: `מנעולן ${a.nameIn}`,
+  serviceType: 'מנעולנות',
+  url: abs(`/areas/${a.slug}/`),
+  provider: businessRef,
+  areaServed: { '@type': 'City', name: a.name },
+};
+const quick = services.filter((s) => s.urgent);
+---
+<BaseLayout title={a.metaTitle} description={a.metaDescription} schema={[breadcrumbSchema(crumbs), pageSchema]}>
+  <PageHero title={`מנעולן ${a.nameIn}`} lead={a.intro} crumbs={crumbs}>
+    <div class="eta-box">
+      <span class="eta-num">{a.eta.min}-{a.eta.max}</span>
+      <span class="eta-txt">דקות הגעה טיפוסיות {a.nameIn}, גם בלילה</span>
+    </div>
+    <div class="hero-actions">
+      <a class="btn btn--alert" href={telUrl}><Icon name="phone" /><span>חייגו <span class="ltr">{contact.phone}</span></span></a>
+      <a class="btn btn--line" href={`/prices/?area=${a.slug}#estimator`}>חשבו מחיר ל{a.name}</a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap local">
+      <div class="prose-col">
+        <h2>מה מיוחד בדלתות ובמנעולים {a.nameIn}</h2>
+        {a.local.map((p) => <p>{p}</p>)}
+      </div>
+      <aside class="issues">
+        <h2 class="h3">מה אנחנו פוגשים הכי הרבה</h2>
+        <ul>
+          {a.commonIssues.map((c) => <li><strong>{c.title}</strong><span>{c.text}</span></li>)}
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--card" aria-labelledby="hoods-title">
+    <div class="wrap">
+      <h2 id="hoods-title" class="mb">שכונות ויישובים שאנחנו מגיעים אליהם</h2>
+      <ul class="hoods">{a.neighborhoods.map((n) => <li><Icon name="pin" size={16} />{n}</li>)}</ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="svc-title">
+    <div class="wrap">
+      <h2 id="svc-title" class="mb">שירותים {a.nameIn}</h2>
+      <ServiceList list={services} />
+      <p class="quick muted">הקריאות הדחופות הנפוצות {a.nameIn}: {quick.map((s, i) => <>{i > 0 && ', '}{s.navTitle} (מ-{formatPrice(s.price.from)})</>)}.</p>
+    </div>
+  </section>
+
+  {areaReviews.length > 0 && (
+    <section class="section section--card" aria-labelledby="rev-title">
+      <div class="wrap">
+        <h2 id="rev-title" class="mb">לקוחות {a.nameIn} מספרים</h2>
+        <div class="reviews">{areaReviews.map((r) => <ReviewCard review={r} />)}</div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="other-title">
+    <div class="wrap">
+      <h2 id="other-title" class="mb">אזורים נוספים</h2>
+      <ul class="others">{others.map((o) => <li><a href={`/areas/${o.slug}/`}>מנעולן {o.nameIn}<span>{o.eta.min}-{o.eta.max} דק'</span></a></li>)}</ul>
+    </div>
+  </section>
+
+  <CtaBand title={`מנעולן ${a.nameIn}, עכשיו`} waText={`שלום עידו, אני צריך מנעולן ${a.nameIn}.`} />
+</BaseLayout>
+
+<style>
+  .eta-box { display: flex; align-items: baseline; gap: var(--s-3); margin-top: var(--s-5); }
+  .eta-num { font-size: 3rem; font-weight: 900; font-stretch: 62.5%; color: var(--c-open); line-height: 1; }
+  .eta-txt { color: var(--c-on-night-muted); }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-5); }
+  .local { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--s-8); align-items: start; }
+  .prose-col h2 { margin-bottom: var(--s-5); }
+  .prose-col p { max-width: 68ch; }
+  .issues { background: var(--c-night); color: var(--c-on-night); border-radius: 12px; padding: var(--s-6); }
+  .h3 { font-size: var(--t-h3); margin-bottom: var(--s-4); }
+  .issues ul { list-style: none; display: grid; gap: var(--s-4); }
+  .issues li { display: grid; gap: 2px; padding-inline-start: var(--s-4); border-inline-start: 3px solid var(--c-alert); }
+  .issues span { color: var(--c-on-night-muted); font-size: 1rem; }
+  .mb { margin-bottom: var(--s-5); }
+  .hoods { list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .hoods li { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid var(--c-line); border-radius: 999px; background: var(--c-paper); font-size: 1rem; }
+  .quick { margin-top: var(--s-5); }
+  .reviews { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--s-5); }
+  .others { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-3); }
+  .others a { display: flex; justify-content: space-between; align-items: center; min-height: 56px; padding: 0 var(--s-4); border: 1.5px solid var(--c-line); border-radius: var(--radius); background: var(--c-card); color: var(--c-ink); text-decoration: none; font-weight: 700; }
+  .others span { font-weight: 500; color: var(--c-muted); font-size: 0.9375rem; }
+  .others a:hover { border-color: var(--c-signal); }
+  @media (max-width: 900px) { .local { grid-template-columns: 1fr; gap: var(--s-7); } }
+</style>

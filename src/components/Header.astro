@@ -1,0 +1,80 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { nav, contact, telUrl } from '../config/site.config';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="site-header night" data-header>
+  <div class="wrap bar">
+    <Logo />
+
+    <nav class="nav" aria-label="ניווט ראשי">
+      <ul>
+        {nav.filter((n) => n.href !== '/contact/').map((n) => (
+          <li><a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <p class="live"><span class="dot" aria-hidden="true"></span>זמינים עכשיו</p>
+      <a class="btn btn--alert call" href={telUrl}>
+        <Icon name="phone" size={20} />
+        <span class="visually-hidden">התקשרו </span>
+        <span class="ltr num">{contact.phone}</span>
+        <span class="short" aria-hidden="true">חייגו</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
+        <span class="visually-hidden" data-menu-label>פתיחת תפריט</span>
+        <Icon name="menu" size={26} />
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="ניווט ראשי" hidden data-mobile-nav>
+    <ul class="wrap">
+      <li><a href="/" aria-current={path === '/' ? 'page' : undefined}>דף הבית</a></li>
+      {nav.map((n) => <li><a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined}>{n.label}</a></li>)}
+      <li><a href="/emergency/">נעולים בחוץ? מה עושים עכשיו</a></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 90; border-bottom: 1px solid var(--c-night-line); }
+  .bar { display: flex; align-items: center; gap: var(--s-5); min-height: 76px; }
+  .nav { margin-inline-start: auto; }
+  .nav ul { list-style: none; display: flex; gap: var(--s-1); }
+  .nav a {
+    display: inline-flex; align-items: center; min-height: 44px; padding-inline: 10px;
+    color: var(--c-on-night); text-decoration: none; font-size: 1rem; font-weight: 600; border-radius: 4px;
+  }
+  .nav a:hover { background: var(--c-night-2); }
+  .nav a[aria-current='page'] { box-shadow: inset 0 -3px 0 var(--c-alert); }
+  .actions { display: flex; align-items: center; gap: var(--s-3); }
+  .nav + .actions { margin-inline-start: 0; }
+  .live { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 600; color: var(--c-open); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c-open); box-shadow: 0 0 0 0 rgb(52 211 153 / 0.6); animation: pulse 2.4s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgb(52 211 153 / 0); } 100% { box-shadow: 0 0 0 0 rgb(52 211 153 / 0); } }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  .call { min-height: 46px; }
+  .menu-toggle { display: none; width: 46px; height: 46px; align-items: center; justify-content: center; background: none; border: 1px solid var(--c-night-line); border-radius: var(--radius); color: var(--c-on-night); cursor: pointer; }
+
+  .mobile-nav { border-top: 1px solid var(--c-night-line); padding-block: var(--s-3) var(--s-5); }
+  .mobile-nav ul { list-style: none; display: grid; }
+  .mobile-nav a { display: flex; align-items: center; min-height: 52px; color: var(--c-on-night); text-decoration: none; font-size: 1.25rem; font-weight: 800; font-stretch: 75%; border-bottom: 1px solid var(--c-night-line); }
+  .mobile-nav a[aria-current='page'] { color: var(--c-alert-on-night); }
+
+  @media (max-width: 1080px) {
+    .nav, .live { display: none; }
+    .actions { margin-inline-start: auto; }
+    .menu-toggle { display: inline-flex; }
+  }
+  .short { display: none; }
+  @media (max-width: 420px) {
+    .call .num { display: none; }
+    .short { display: inline; }
+  }
+</style>

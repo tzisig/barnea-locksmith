@@ -1,0 +1,54 @@
+---
+// The technician ID card: who will knock on the door. A trust device against fake locksmiths.
+import { Picture } from 'astro:assets';
+import { owner, techCard, site, formatDate } from '../config/site.config';
+---
+<figure class="tech">
+  <div class="card" role="group" aria-label={`תעודת טכנאי: ${owner.name}`}>
+    <div class="top">
+      <span class="org">{site.name}</span>
+      <span class="verified">מאומת</span>
+    </div>
+    <div class="body">
+      <div class="photo">
+        <Picture src={owner.image} alt={`תמונת תעודה: ${owner.name}`} widths={[160, 320]} sizes="120px" formats={['avif', 'webp']} loading="lazy" />
+      </div>
+      <dl>
+        <div><dt>שם</dt><dd>{owner.name}</dd></div>
+        <div><dt>תפקיד</dt><dd>{owner.role}</dd></div>
+        <div><dt>מספר עובד</dt><dd class="ltr">{techCard.employeeId}</dd></div>
+        <div><dt>רכב</dt><dd>{techCard.vehicle}, <span class="ltr">{techCard.vehiclePlate}</span></dd></div>
+      </dl>
+    </div>
+    <p class="valid">בתוקף עד {formatDate(techCard.validUntil)}</p>
+  </div>
+  <figcaption>
+    <strong>{techCard.title}</strong>
+    <span>{techCard.text}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .tech { margin: 0; display: grid; gap: var(--s-4); }
+  .card {
+    position: relative; overflow: hidden; border-radius: 14px; padding: var(--s-5);
+    background: linear-gradient(135deg, #151A3B 0%, #0A0E27 100%); color: var(--c-on-night);
+    border: 1px solid var(--c-night-line); box-shadow: 0 24px 50px -30px rgb(10 14 39 / 0.8);
+    max-width: 440px;
+  }
+  .card::after { content: ''; position: absolute; inset-inline-end: -40px; top: -40px; width: 140px; height: 140px; border-radius: 50%; border: 18px solid rgb(220 38 38 / 0.18); }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--s-4); }
+  .org { font-weight: 900; font-stretch: 62.5%; font-size: 1.375rem; letter-spacing: 0.02em; }
+  .verified { position: relative; z-index: 1; font-size: 0.8125rem; font-weight: 800; color: var(--c-open); border: 1.5px solid var(--c-open); border-radius: 999px; padding: 2px 10px; }
+  .body { display: grid; grid-template-columns: 110px 1fr; gap: var(--s-4); align-items: start; }
+  .photo { width: 110px; aspect-ratio: 3 / 4; border-radius: 8px; overflow: hidden; background: var(--c-night-line); }
+  .photo :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  dl { margin: 0; display: grid; gap: 6px; font-size: 0.9375rem; }
+  dt { font-size: 0.75rem; color: var(--c-on-night-muted); }
+  dd { margin: 0; font-weight: 700; line-height: 1.35; }
+  .valid { margin-top: var(--s-4); font-size: 0.8125rem; color: var(--c-on-night-muted); border-top: 1px dashed var(--c-night-line); padding-top: var(--s-3); }
+  figcaption { display: grid; gap: 4px; max-width: 440px; }
+  figcaption strong { font-size: 1.125rem; }
+  figcaption span { color: var(--c-muted); }
+  :global(.night) figcaption span { color: var(--c-on-night-muted); }
+</style>

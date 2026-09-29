@@ -1,0 +1,113 @@
+---
+import '@fontsource-variable/noto-sans-hebrew/standard.css';
+import '../styles/global.css';
+import fontHebrew from '@fontsource-variable/noto-sans-hebrew/files/noto-sans-hebrew-hebrew-standard-normal.woff2?url';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileBar from '../components/MobileBar.astro';
+import CookieConsent from '../components/CookieConsent.astro';
+import { site, theme, contact, owner, social, images, services, areas, stats, analytics, surcharges } from '../config/site.config';
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  title: string;
+  description: string;
+  schema?: object[];
+  noindex?: boolean;
+  ogImage?: ImageMetadata;
+}
+const { title, description, schema = [], noindex = false, ogImage } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+const og = await getImage({ src: ogImage ?? images.hero, width: 1200, height: 630, format: 'jpg', fit: 'cover' });
+const ogUrl = new URL(og.src, site.url).href;
+// Demo sites are never indexed (site.isDemo); public/_headers also sends X-Robots-Tag
+const robots = noindex || site.isDemo ? 'noindex, nofollow' : '';
+
+const c = theme.colors;
+const kebab = (k: string) => k.replace(/[A-Z0-9]+/g, (m) => '-' + m.toLowerCase());
+const cssVars = `:root{${Object.entries(c).map(([k, v]) => `--c-${kebab(k)}:${v}`).join(';')}}`;
+
+const sameAs = Object.values(social).filter(Boolean);
+const minPrice = Math.min(...services.map((s) => s.price.from));
+const businessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Locksmith',
+  '@id': `${site.url}/#business`,
+  name: site.name,
+  description: `${site.tagline}. ${owner.shortBio}`,
+  url: site.url + '/',
+  telephone: contact.phoneHref,
+  email: contact.email,
+  image: ogUrl,
+  priceRange: `החל מ-${minPrice} ₪`,
+  currenciesAccepted: 'ILS',
+  paymentAccepted: 'מזומן, אשראי, ביט, העברה בנקאית',
+  address: { '@type': 'PostalAddress', addressLocality: contact.locality, addressRegion: contact.region, addressCountry: contact.country },
+  geo: { '@type': 'GeoCoordinates', latitude: contact.geo.lat, longitude: contact.geo.lng },
+  areaServed: areas.map((a) => ({ '@type': 'City', name: a.name })),
+  ...(contact.is247
+    ? { openingHoursSpecification: { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], opens: '00:00', closes: '23:59' } }
+    : {}),
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: stats.rating, reviewCount: stats.reviewCount, bestRating: 5 },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'שירותי מנעולנות',
+    itemListElement: services.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.title, url: `${site.url}/services/${s.slug}/` },
+      priceSpecification: { '@type': 'PriceSpecification', minPrice: s.price.from, maxPrice: Math.round(s.price.to * surcharges[surcharges.length - 1].factor), priceCurrency: 'ILS' },
+    })),
+  },
+  founder: { '@type': 'Person', name: owner.name, jobTitle: owner.role },
+  ...(sameAs.length ? { sameAs } : {}),
+};
+const allSchema = [businessSchema, ...schema];
+---
+<!doctype html>
+<html lang={site.lang} dir={site.dir} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {robots && <meta name="robots" content={robots} />}
+    <meta name="theme-color" content={theme.themeColor} />
+    <meta name="format-detection" content="telephone=no" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preload" href={fontHebrew} as="font" type="font/woff2" crossorigin />
+    <style set:html={cssVars}></style>
+    <script is:inline>document.documentElement.classList.replace('no-js', 'js');</script>
+    {allSchema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">דלגו לתוכן הראשי</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <MobileBar />
+    <CookieConsent ga4={analytics.ga4} />
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

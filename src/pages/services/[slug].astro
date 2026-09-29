@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import Estimator from '../../components/Estimator.astro';
+import FaqList from '../../components/FaqList.astro';
+import ReviewCard from '../../components/ReviewCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { services, areas, serviceBySlug, reviewsFor, surcharges, formatPrice, formatDate, site, contact, telUrl, type Service } from '../../config/site.config';
+import { breadcrumbSchema, faqSchema, home, businessRef, abs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+interface Props { service: Service }
+const { service: s } = Astro.props;
+const related = s.related.map(serviceBySlug).filter((x): x is Service => Boolean(x));
+const svcReviews = reviewsFor({ service: s.slug });
+const crumbs = [home, { label: 'שירותים', href: '/services/' }, { label: s.navTitle, href: `/services/${s.slug}/` }];
+const maxFactor = surcharges[surcharges.length - 1].factor;
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: s.title,
+  serviceType: s.navTitle,
+  description: s.metaDescription,
+  url: abs(`/services/${s.slug}/`),
+  provider: businessRef,
+  areaServed: areas.map((a) => ({ '@type': 'City', name: a.name })),
+  offers: { '@type': 'Offer', priceSpecification: { '@type': 'PriceSpecification', minPrice: s.price.from, maxPrice: Math.round(s.price.to * maxFactor), priceCurrency: 'ILS' } },
+};
+---
+<BaseLayout title={s.metaTitle} description={s.metaDescription} schema={[breadcrumbSchema(crumbs), serviceSchema, faqSchema(s.faqs)]} ogImage={s.image}>
+  <PageHero title={s.title} lead={s.intro} crumbs={crumbs} image={s.image} imageAlt={s.imageAlt}>
+    <div class="hero-meta">
+      <p><strong>החל מ-{formatPrice(s.price.from)}</strong> ביום, כולל מע"מ</p>
+      <p><Icon name="clock" size={18} /> {s.duration}</p>
+    </div>
+    {s.urgent && (
+      <a class="btn btn--alert urgent" href={telUrl}><Icon name="phone" /><span>דחוף? חייגו <span class="ltr">{contact.phone}</span></span></a>
+    )}
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap cols">
+      <div>
+        <h2>מתי מזמינים</h2>
+        <ul class="ticks">{s.whenToCall.map((w) => <li>{w}</li>)}</ul>
+      </div>
+      <div>
+        <h2>מה כלול</h2>
+        <ul class="ticks">{s.included.map((w) => <li>{w}</li>)}</ul>
+        <p class="price-note">{s.priceNote}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--card" aria-labelledby="how-title">
+    <div class="wrap">
+      <h2 id="how-title">איך עובדים</h2>
+      <ol class="how">
+        {s.howWeWork.map((h, i) => (
+          <li class="reveal" style={`--i:${i}`}>
+            <span class="n" aria-hidden="true">{i + 1}</span>
+            <h3>{h.title}</h3>
+            <p>{h.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {s.table && (
+    <section class="section" aria-label={s.table.caption}>
+      <div class="wrap">
+        <div class="table-wrap">
+          <table>
+            <caption>{s.table.caption}</caption>
+            <thead><tr>{s.table.head.map((h) => <th scope="col">{h}</th>)}</tr></thead>
+            <tbody>{s.table.rows.map((r) => <tr><th scope="row">{r[0]}</th>{r.slice(1).map((c) => <td>{c}</td>)}</tr>)}</tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-label="מחשבון מחיר">
+    <div class="wrap est"><Estimator defaultService={s.slug} headingLevel="h2" /></div>
+  </section>
+
+  {svcReviews.length > 0 && (
+    <section class="section section--card" aria-labelledby="rev-title">
+      <div class="wrap">
+        <h2 id="rev-title" class="mb">לקוחות על {s.navTitle}</h2>
+        <div class="reviews">{svcReviews.map((r) => <ReviewCard review={r} />)}</div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="narrow">
+      <h2 id="faq-title" class="mb">שאלות על {s.navTitle}</h2>
+      <FaqList items={s.faqs} />
+      <p class="updated muted small">המחירים בעמוד נבדקו ב-{formatDate(site.contentUpdated)}.</p>
+    </div>
+  </section>
+
+  <section class="section section--card" aria-labelledby="rel-title">
+    <div class="wrap">
+      <h2 id="rel-title" class="mb">שירותים קשורים</h2>
+      <ul class="rel">
+        {related.map((r) => <li><a href={`/services/${r.slug}/`}><Icon name={r.icon} /> {r.title}</a></li>)}
+      </ul>
+      <p class="areas-line">{s.navTitle} בכל האזורים: {areas.map((a, i) => <>{i > 0 && ', '}<a href={`/areas/${a.slug}/`}>{a.name}</a></>)}.</p>
+    </div>
+  </section>
+
+  <CtaBand title={`צריכים ${s.navTitle}?`} waText={`שלום עידו, אני צריך ${s.navTitle}.`} />
+</BaseLayout>
+
+<style>
+  .hero-meta { display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-6); margin-top: var(--s-5); }
+  .hero-meta p { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+  .hero-meta strong { font-size: 1.25rem; color: var(--c-open); }
+  .urgent { margin-top: var(--s-5); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-8); }
+  .cols h2, .mb { margin-bottom: var(--s-5); }
+  .price-note { margin-top: var(--s-5); padding: var(--s-4); background: var(--c-card); border: 1px solid var(--c-line); border-radius: var(--radius); font-size: 1rem; }
+  #how-title { margin-bottom: var(--s-6); }
+  .how { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-6); }
+  .how li { border-top: 3px solid var(--c-night); padding-top: var(--s-4); }
+  .n { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--c-alert); color: #fff; font-weight: 900; margin-bottom: var(--s-3); }
+  .how h3 { margin-bottom: var(--s-2); }
+  .how p { color: var(--c-muted); font-size: 1rem; }
+  .est { max-width: 900px; }
+  .reviews { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--s-5); }
+  .updated { margin-top: var(--s-5); }
+  .rel { list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .rel a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 var(--s-4); border: 1.5px solid var(--c-line); border-radius: var(--radius); color: var(--c-ink); text-decoration: none; font-weight: 700; }
+  .rel a:hover { border-color: var(--c-signal); }
+  .areas-line { margin-top: var(--s-5); color: var(--c-muted); }
+  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; gap: var(--s-7); } }
+</style>

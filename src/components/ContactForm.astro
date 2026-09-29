@@ -1,0 +1,124 @@
+---
+import Icon from './Icon.astro';
+import { form, site } from '../config/site.config';
+interface Props { defaultTopic?: string; id?: string }
+const { defaultTopic = '', id = 'lead' } = Astro.props;
+---
+<form class="lead-form" novalidate data-lead-form data-destinations={JSON.stringify(form.destinations)} data-thanks={form.thankYouPath}>
+  <div class="row">
+    <div class="field">
+      <label for={`${id}-name`}>שם</label>
+      <input id={`${id}-name`} name="name" type="text" autocomplete="name" required aria-describedby={`${id}-name-err`} />
+      <p class="error" id={`${id}-name-err`} aria-live="polite"></p>
+    </div>
+    <div class="field">
+      <label for={`${id}-phone`}>טלפון</label>
+      <input id={`${id}-phone`} name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required aria-describedby={`${id}-phone-err`} />
+      <p class="error" id={`${id}-phone-err`} aria-live="polite"></p>
+    </div>
+  </div>
+  <div class="field">
+    <label for={`${id}-topic`}>מה צריך?</label>
+    <select id={`${id}-topic`} name="topic">
+      {form.topics.map((t) => <option selected={t === defaultTopic}>{t}</option>)}
+    </select>
+  </div>
+  <div class="field">
+    <label for={`${id}-msg`}>פרטים (לא חובה)</label>
+    <textarea id={`${id}-msg`} name="message" placeholder="כתובת, סוג הדלת, מה קרה"></textarea>
+  </div>
+  <div class="hp" aria-hidden="true">
+    <label for={`${id}-company`}>חברה</label>
+    <input id={`${id}-company`} name="company_site" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="source_page" />
+  <input type="hidden" name="utm" />
+  <p class="status" role="alert" hidden data-status>ההודעה לא נשלחה. נסו שוב, או התקשרו אלינו ישירות.</p>
+  <button class="btn btn--alert" type="submit"><Icon name="check" /><span class="label">{form.submitLabel}</span></button>
+  <p class="note">{form.privacyNote} <a href="/privacy/">מדיניות פרטיות</a>.{site.isDemo && form.destinations.length === 0 && ' טופס הדגמה: שום דבר לא נשלח.'}</p>
+</form>
+
+<style>
+  .lead-form { display: grid; gap: var(--s-4); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  .hp { position: absolute; inset-inline-start: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .status { color: var(--c-error); font-weight: 700; }
+  .note { font-size: 0.875rem; color: var(--c-muted); }
+  button { justify-self: start; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } button { justify-self: stretch; } }
+</style>
+
+<script>
+  import { track } from '../scripts/site';
+
+  type Destination = { type: 'web3forms'; accessKey: string } | { type: 'webhook'; url: string };
+
+  const send = async (d: Destination, data: Record<string, FormDataEntryValue>) => {
+    const isEmail = d.type === 'web3forms';
+    const res = await fetch(isEmail ? 'https://api.web3forms.com/submit' : d.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(isEmail ? { access_key: d.accessKey, subject: `פנייה חדשה: ${data.topic}`, ...data } : data),
+    });
+    if (!res.ok) throw new Error(`${d.type} ${res.status}`);
+  };
+
+  const PHONE_RE = /^(?:\+?972|0)(?:[23489]|5\d|7\d)\d{7}$/;
+
+  document.querySelectorAll<HTMLFormElement>('[data-lead-form]').forEach((formEl) => {
+    const params = new URLSearchParams(location.search);
+    const utm = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']
+      .filter((k) => params.get(k)).map((k) => `${k}=${params.get(k)}`).join('&');
+    (formEl.elements.namedItem('source_page') as HTMLInputElement).value = location.pathname;
+    (formEl.elements.namedItem('utm') as HTMLInputElement).value = utm || document.referrer || 'direct';
+
+    const setError = (input: HTMLInputElement, msg: string) => {
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      const err = document.getElementById(input.getAttribute('aria-describedby') || '');
+      if (err) err.textContent = msg;
+    };
+    const validate = () => {
+      const name = formEl.elements.namedItem('name') as HTMLInputElement;
+      const phone = formEl.elements.namedItem('phone') as HTMLInputElement;
+      let ok = true;
+      if (name.value.trim().length < 2) { setError(name, 'נא למלא שם'); ok = false; } else setError(name, '');
+      if (!PHONE_RE.test(phone.value.replace(/[\s\-()]/g, ''))) { setError(phone, 'נא למלא מספר טלפון תקין, למשל 050-1234567'); ok = false; } else setError(phone, '');
+      if (!ok) formEl.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+      return ok;
+    };
+    formEl.querySelectorAll('input[required]').forEach((i) => i.addEventListener('blur', () => { if ((i as HTMLInputElement).value) validate(); }));
+
+    formEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = formEl.querySelector<HTMLElement>('[data-status]')!;
+      status.hidden = true;
+      if ((formEl.elements.namedItem('company_site') as HTMLInputElement).value) return; // bot
+      if (!validate()) return;
+      const btn = formEl.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      const label = btn.querySelector('.label')!;
+      const original = label.textContent;
+      btn.disabled = true;
+      label.textContent = 'שולח...';
+      const data = Object.fromEntries(new FormData(formEl).entries());
+      const destinations: Destination[] = JSON.parse(formEl.dataset.destinations || '[]');
+      try {
+        // Every destination gets the lead; success if at least one accepted it (demo mode: none configured)
+        if (destinations.length) {
+          const results = await Promise.allSettled(destinations.map((d) => send(d, data)));
+          const failed = results.filter((r) => r.status === 'rejected');
+          failed.forEach((r) => console.error('Lead destination failed', (r as PromiseRejectedResult).reason));
+          if (failed.length) track('form_destination_error', { failed: failed.length, total: destinations.length });
+          if (failed.length === destinations.length) throw new Error('All lead destinations failed');
+        }
+        track('generate_lead', { form_topic: String(data.topic), page: location.pathname });
+        location.href = formEl.dataset.thanks || '/thank-you/';
+      } catch (err) {
+        console.error('Lead form failed', err);
+        track('form_error', { page: location.pathname });
+        status.hidden = false;
+        btn.disabled = false;
+        label.textContent = original;
+      }
+    });
+  });
+</script>

@@ -1,0 +1,56 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import TechCard from '../components/TechCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { owner, stats, site, images } from '../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../lib/schema';
+
+const crumbs = [home, { label: 'אודות', href: '/about/' }];
+const person = { '@context': 'https://schema.org', '@type': 'Person', name: owner.name, jobTitle: owner.role, worksFor: businessRef, url: abs('/about/') };
+---
+<BaseLayout title={`${owner.name}, מנעולן בירושלים`} description={`${owner.name} פותח דלתות ומחליף מנעולים בירושלים מאז ${owner.since}. הסיפור, העקרונות, ומה מבדיל את ${site.name} מנעולנים אחרים.`} schema={[breadcrumbSchema(crumbs), person]}>
+  <PageHero title={`נעים מאוד, ${owner.name}`} lead={owner.shortBio} crumbs={crumbs} image={images.workshop} imageAlt={images.workshopAlt} />
+
+  <section class="section">
+    <div class="wrap story">
+      <div class="text">
+        {owner.story.map((p) => <p>{p}</p>)}
+        <dl class="stats">
+          <div><dt>שנות ניסיון</dt><dd>{stats.years}</dd></div>
+          <div><dt>קריאות שטופלו</dt><dd>{stats.jobs.toLocaleString('he-IL')}+</dd></div>
+          <div><dt>פתיחה בלי נזק</dt><dd>{stats.noDamage}%</dd></div>
+        </dl>
+      </div>
+      <TechCard />
+    </div>
+  </section>
+
+  <section class="section section--card" aria-labelledby="cert-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="cert-title" class="mb">הכשרה וביטוח</h2>
+        <ul class="ticks">{owner.certifications.map((c) => <li>{c}</li>)}</ul>
+      </div>
+      <div class="media">
+        <Picture src={images.carKey} alt={images.carKeyAlt} widths={[400, 700]} sizes="(min-width: 900px) 40vw, 100vw" formats={['avif', 'webp']} loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .story { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--s-8); align-items: start; }
+  .text p { max-width: 64ch; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); margin: var(--s-7) 0 0; }
+  .stats div { border-top: 3px solid var(--c-alert); padding-top: var(--s-3); }
+  dt { font-size: 0.9375rem; color: var(--c-muted); }
+  dd { margin: 0; font-size: 2.25rem; font-weight: 900; font-stretch: 75%; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-8); align-items: center; }
+  .mb { margin-bottom: var(--s-5); }
+  .two .media { aspect-ratio: 4 / 3; }
+  @media (max-width: 900px) { .story, .two { grid-template-columns: 1fr; } }
+</style>

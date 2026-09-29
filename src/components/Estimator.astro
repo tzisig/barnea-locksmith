@@ -1,0 +1,131 @@
+---
+// Transparent price estimator: service x time of day x area -> price range and arrival time.
+// All numbers come from the config, so the estimate always matches the price table.
+import Icon from './Icon.astro';
+import { services, areas, surcharges, formatRange, whatsappUrl, telUrl, contact } from '../config/site.config';
+
+interface Props { id?: string; headingLevel?: 'h2' | 'h3'; defaultService?: string }
+const { id = 'estimator', headingLevel = 'h2', defaultService } = Astro.props;
+const H = headingLevel;
+
+const data = {
+  services: services.map((s) => ({ slug: s.slug, name: s.navTitle, from: s.price.from, to: s.price.to, urgent: s.urgent })),
+  areas: areas.map((a) => ({ slug: a.slug, name: a.name, min: a.eta.min, max: a.eta.max })),
+  times: surcharges.map((t) => ({ id: t.id, label: t.label, factor: t.factor, note: t.note })),
+};
+const first = { s: services[0], a: areas[0], t: surcharges[0] };
+const initialPrice = formatRange(first.s.price.from * first.t.factor, first.s.price.to * first.t.factor);
+---
+<section class="estimator" id={id} aria-labelledby={`${id}-title`} data-estimator data-model={JSON.stringify(data)} data-wa={whatsappUrl('')} data-default-service={defaultService}>
+  <div class="intro">
+    <H id={`${id}-title`}>כמה זה יעלה, ומתי תגיעו?</H>
+    <p class="muted">בחרו מה קרה, מתי ואיפה. המחיר כולל מע"מ ונסיעה, והוא אותו מחיר שתשמעו בטלפון.</p>
+  </div>
+
+  <div class="grid">
+    <div class="field">
+      <label for={`${id}-service`}>מה צריך?</label>
+      <select id={`${id}-service`} data-est-service>
+        {services.map((s) => <option value={s.slug}>{s.navTitle}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for={`${id}-area`}>איפה?</label>
+      <select id={`${id}-area`} data-est-area>
+        {areas.map((a) => <option value={a.slug}>{a.name}</option>)}
+      </select>
+    </div>
+    <fieldset class="times">
+      <legend>מתי?</legend>
+      <div class="chips">
+        {surcharges.map((t, i) => (
+          <label class="chip">
+            <input type="radio" name={`${id}-time`} value={t.id} checked={i === 0} data-est-time />
+            <span>{t.label}<small>{t.note}</small></span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="result night" aria-live="polite">
+    <div class="res-item">
+      <span class="res-label"><Icon name="price" size={18} /> טווח מחיר</span>
+      <strong class="res-value" data-est-price>{initialPrice}</strong>
+    </div>
+    <div class="res-item">
+      <span class="res-label"><Icon name="clock" size={18} /> זמן הגעה</span>
+      <strong class="res-value" data-est-eta>{first.a.eta.min}-{first.a.eta.max} דקות</strong>
+    </div>
+    <div class="res-actions">
+      <a class="btn btn--wa" href={whatsappUrl(`שלום, אני צריך ${first.s.navTitle} ב${first.a.name}.`)} target="_blank" rel="noopener" data-est-wa>
+        <Icon name="whatsapp" /><span>שלחו לעידו בוואטסאפ</span><span class="visually-hidden">(נפתח בחלון חדש)</span>
+      </a>
+      <a class="btn btn--alert" href={telUrl}><Icon name="phone" /><span class="ltr">{contact.phone}</span></a>
+    </div>
+    <p class="fine">טווח המחיר הסופי תלוי בסוג הדלת או המנעול, ותשמעו אותו לפני שמתחילים לעבוד.</p>
+  </div>
+</section>
+
+<style>
+  .estimator { background: var(--c-card); border: 1px solid var(--c-line); border-radius: 12px; padding: clamp(var(--s-5), 4vw, var(--s-7)); display: grid; gap: var(--s-5); }
+  .intro p { margin-top: var(--s-2); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  .times { grid-column: 1 / -1; border: 0; padding: 0; margin: 0; }
+  legend { font-weight: 700; font-size: 1rem; margin-bottom: 6px; padding: 0; }
+  .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); }
+  .chip { position: relative; cursor: pointer; }
+  .chip input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .chip span { display: grid; gap: 2px; min-height: 60px; align-content: center; padding: 8px 12px; border: 1.5px solid #94A3B8; border-radius: var(--radius); font-weight: 700; font-size: 0.9375rem; line-height: 1.3; }
+  .chip small { font-weight: 500; color: var(--c-muted); font-size: 0.8125rem; }
+  .chip input:checked + span { border-color: var(--c-signal); background: #EFF5FF; box-shadow: inset 0 0 0 1px var(--c-signal); }
+  .chip input:focus-visible + span { outline: 3px solid var(--c-signal); outline-offset: 2px; }
+  .result { border-radius: 10px; padding: var(--s-5); display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4) var(--s-5); }
+  .res-label { display: flex; align-items: center; gap: 6px; font-size: 0.9375rem; color: var(--c-on-night-muted); }
+  .res-value { display: block; margin-top: 4px; font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); font-weight: 900; font-stretch: 75%; color: var(--c-open); }
+  .res-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .fine { grid-column: 1 / -1; font-size: 0.875rem; color: var(--c-on-night-muted); }
+  @media (max-width: 640px) {
+    .grid, .result { grid-template-columns: 1fr; }
+    .chips { grid-template-columns: 1fr; }
+    .chip span { min-height: 52px; }
+  }
+</style>
+
+<script>
+  type Model = {
+    services: { slug: string; name: string; from: number; to: number }[];
+    areas: { slug: string; name: string; min: number; max: number }[];
+    times: { id: string; label: string; factor: number }[];
+  };
+  const r10 = (n: number) => (Math.round(n / 10) * 10).toLocaleString('he-IL');
+
+  document.querySelectorAll<HTMLElement>('[data-estimator]').forEach((root) => {
+    const m: Model = JSON.parse(root.dataset.model || '{}');
+    const svc = root.querySelector<HTMLSelectElement>('[data-est-service]')!;
+    const area = root.querySelector<HTMLSelectElement>('[data-est-area]')!;
+    const times = [...root.querySelectorAll<HTMLInputElement>('[data-est-time]')];
+    const price = root.querySelector<HTMLElement>('[data-est-price]')!;
+    const eta = root.querySelector<HTMLElement>('[data-est-eta]')!;
+    const wa = root.querySelector<HTMLAnchorElement>('[data-est-wa]')!;
+    const waBase = root.dataset.wa || '';
+
+    // A service page can preselect its own service: ?service=<slug> or data-default-service
+    const pre = new URLSearchParams(location.search).get('service') || root.dataset.defaultService;
+    if (pre && m.services.some((s) => s.slug === pre)) svc.value = pre;
+    const preArea = new URLSearchParams(location.search).get('area');
+    if (preArea && m.areas.some((a) => a.slug === preArea)) area.value = preArea;
+
+    const update = () => {
+      const s = m.services.find((x) => x.slug === svc.value)!;
+      const a = m.areas.find((x) => x.slug === area.value)!;
+      const t = m.times.find((x) => x.id === times.find((r) => r.checked)?.value) || m.times[0];
+      price.textContent = `${r10(s.from * t.factor)}-${r10(s.to * t.factor)} ₪`;
+      eta.textContent = `${a.min}-${a.max} דקות`;
+      const text = `שלום עידו, אני צריך ${s.name} ב${a.name} (${t.label}). ראיתי באתר טווח של ${price.textContent}.`;
+      wa.href = waBase + encodeURIComponent(text);
+    };
+    [svc, area, ...times].forEach((el) => el.addEventListener('change', update));
+    update();
+  });
+</script>

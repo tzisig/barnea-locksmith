@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { reviews, stats, site } from '../config/site.config';
+import { breadcrumbSchema, home, businessRef } from '../lib/schema';
+
+const crumbs = [home, { label: 'ביקורות', href: '/reviews/' }];
+const reviewSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Locksmith',
+  ...businessRef,
+  name: site.name,
+  review: reviews.map((r) => ({ '@type': 'Review', author: { '@type': 'Person', name: r.name }, datePublished: r.date, reviewBody: r.text, reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 } })),
+};
+---
+<BaseLayout title="ביקורות לקוחות" description={`${stats.rating} מתוך 5 לפי ${stats.reviewCount} ביקורות: מה לקוחות בירושלים והסביבה כותבים על ${site.name}.`} schema={[breadcrumbSchema(crumbs), reviewSchema]}>
+  <PageHero title="מה לקוחות כותבים" lead={`דירוג ${stats.rating} מתוך 5, לפי ${stats.reviewCount} ביקורות ב-${stats.reviewSource}. הנה כמה מהן.`} crumbs={crumbs} />
+  <section class="section">
+    <div class="wrap grid">{reviews.map((r) => <ReviewCard review={r} />)}</div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s-5); }
+</style>

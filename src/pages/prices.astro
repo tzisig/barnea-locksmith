@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Estimator from '../components/Estimator.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, services, surcharges, pricingRules, formatRange, formatDate } from '../config/site.config';
+import { breadcrumbSchema, home } from '../lib/schema';
+
+const crumbs = [home, { label: 'מחירים', href: '/prices/' }];
+---
+<BaseLayout title="מחירון מנעולן בירושלים, כולל תעריף לילה ושבת" description={`מחירון ${site.name} כולל מע"מ: פתיחת דלתות, החלפת צילינדר, רכבים, כספות ועוד. טבלה מלאה לפי יום, לילה ושבת, ומחשבון מחיר לפי אזור.`} schema={[breadcrumbSchema(crumbs)]}>
+  <PageHero title="מחירים שקופים" lead="כל המחירים כוללים מע״מ ונסיעה. הטווח תלוי בסוג הדלת או המנעול, ותשמעו מחיר מדויק בטלפון לפני שיוצאים." crumbs={crumbs} />
+
+  <section class="section">
+    <div class="wrap est"><Estimator /></div>
+  </section>
+
+  <section class="section section--card" aria-labelledby="table-title">
+    <div class="wrap">
+      <h2 id="table-title" class="mb">הטבלה המלאה</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>טווח מחיר לכל שירות, לפי שעה (₪, כולל מע"מ)</caption>
+          <thead>
+            <tr><th scope="col">שירות</th>{surcharges.map((t) => <th scope="col">{t.label}<br /><span class="note">{t.note}</span></th>)}</tr>
+          </thead>
+          <tbody>
+            {services.map((s) => (
+              <tr>
+                <th scope="row"><a href={`/services/${s.slug}/`}>{s.title}</a></th>
+                {surcharges.map((t) => <td>{formatRange(s.price.from * t.factor, s.price.to * t.factor)}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="muted small updated">המחירים נבדקו ב-{formatDate(site.contentUpdated)}.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="rules-title">
+    <div class="narrow prose">
+      <h2 id="rules-title">מה כלול ומה לא</h2>
+      <ul>{pricingRules.map((r) => <li>{r}</li>)}</ul>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .est { max-width: 900px; }
+  .mb { margin-bottom: var(--s-5); }
+  .note { font-weight: 500; font-size: 0.8125rem; color: var(--c-muted); }
+  tbody th a { color: var(--c-ink); }
+  .updated { margin-top: var(--s-4); }
+</style>

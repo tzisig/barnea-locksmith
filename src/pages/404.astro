@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { nav } from '../config/site.config';
+import { home } from '../lib/schema';
+---
+<BaseLayout title="הדף לא נמצא" description="הדף שחיפשתם לא קיים." noindex>
+  <PageHero title="המפתח הזה לא פותח שום דלת" lead="הדף שחיפשתם לא קיים, או שהכתובת השתנתה. אלה הדפים שכדאי להמשיך אליהם:" crumbs={[home, { label: 'הדף לא נמצא' }]}>
+    <ul class="links">
+      <li><a href="/">דף הבית</a></li>
+      {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+    </ul>
+  </PageHero>
+</BaseLayout>
+
+<style>
+  .links { list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); margin-top: var(--s-5); }
+  .links a { display: inline-flex; min-height: 44px; align-items: center; font-weight: 700; }
+</style>

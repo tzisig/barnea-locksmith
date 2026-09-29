@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import TechCard from '../components/TechCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { contact, telUrl, whatsappUrl, site, emergency, etaRange } from '../config/site.config';
+import { breadcrumbSchema, home } from '../lib/schema';
+
+const crumbs = [home, { label: 'נעולים בחוץ', href: '/emergency/' }];
+---
+<BaseLayout title="נעולים בחוץ? מה עושים עכשיו" description={`ננעלתם מחוץ לבית בירושלים והסביבה? חמשת הצעדים הראשונים, מה לא לעשות, ואיך ${site.name} מגיע תוך ${etaRange.min}-${etaRange.max} דקות, 24/7.`} schema={[breadcrumbSchema(crumbs)]}>
+  <PageHero title={emergency.title} lead={`${contact.availabilityLabel}. בדרך כלל אנחנו אצלכם תוך ${etaRange.min}-${etaRange.max} דקות, ורוב הדלתות נפתחות בלי נזק.`} crumbs={crumbs}>
+    <div class="actions">
+      <a class="btn btn--alert big" href={telUrl}><Icon name="phone" /><span>חייגו עכשיו <span class="ltr">{contact.phone}</span></span></a>
+      <a class="btn btn--wa" href={whatsappUrl(emergency.whatsappText)} target="_blank" rel="noopener"><Icon name="whatsapp" /><span>שלחו מיקום בוואטסאפ</span><span class="visually-hidden">(נפתח בחלון חדש)</span></a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="wrap grid">
+      <div>
+        <h2 class="mb">מה עושים בחמש הדקות הקרובות</h2>
+        <ol class="steps">
+          {emergency.steps.map((s, i) => (
+            <li>
+              <span class="n" aria-hidden="true">{i + 1}</span>
+              <div><h3>{s.title}</h3><p>{s.text}</p></div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <aside class="side">
+        <TechCard />
+        <p class="muted small">בלילה ובשבת יש תוספת קבועה שתשמעו בשיחה, לפני שיוצאים. <a href="/prices/">טבלת המחירים</a></p>
+      </aside>
+    </div>
+  </section>
+
+  <CtaBand title="עדיין נעולים?" waText={emergency.whatsappText} />
+</BaseLayout>
+
+<style>
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-6); }
+  .big { min-height: 60px; font-size: 1.25rem; padding-inline: var(--s-6); }
+  .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s-8); align-items: start; }
+  .mb { margin-bottom: var(--s-6); }
+  .steps { list-style: none; display: grid; gap: var(--s-5); }
+  .steps li { display: grid; grid-template-columns: 52px 1fr; gap: var(--s-4); padding-bottom: var(--s-5); border-bottom: 1px solid var(--c-line); }
+  .n { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 12px; background: var(--c-night); color: var(--c-alert-on-night); font-weight: 900; font-size: 1.5rem; font-stretch: 75%; }
+  .steps h3 { margin-bottom: 4px; }
+  .steps p { color: var(--c-muted); }
+  .side { display: grid; gap: var(--s-5); position: sticky; top: 100px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .side { position: static; } }
+</style>

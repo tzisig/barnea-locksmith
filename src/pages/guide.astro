@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import TechCard from '../components/TechCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { guide, site, owner, formatDate } from '../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../lib/schema';
+
+const crumbs = [home, { label: 'מדריך נגד עוקץ', href: '/guide/' }];
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: guide.title,
+  description: guide.metaDescription,
+  author: { '@type': 'Person', name: owner.name },
+  publisher: businessRef,
+  dateModified: site.contentUpdated,
+  mainEntityOfPage: abs('/guide/'),
+};
+---
+<BaseLayout title={guide.title} description={guide.metaDescription} schema={[breadcrumbSchema(crumbs), article]}>
+  <PageHero title={guide.title} lead={guide.lead} crumbs={crumbs} />
+
+  <section class="section" aria-labelledby="flags-title">
+    <div class="wrap">
+      <h2 id="flags-title" class="mb">חמישה סימני אזהרה</h2>
+      <ol class="flags">
+        {guide.redFlags.map((f, i) => (
+          <li class="reveal" style={`--i:${i}`}>
+            <span class="ico"><Icon name="alert" /></span>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--card" aria-labelledby="ask-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="ask-title" class="mb">מה לשאול בטלפון, לפני שמישהו יוצא</h2>
+        <ol class="ask">{guide.askOnPhone.map((q) => <li>{q}</li>)}</ol>
+      </div>
+      <div>
+        <h2 class="mb">ומה אנחנו מתחייבים לו</h2>
+        <ul class="ticks">{guide.ourPromise.map((p) => <li>{p}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-label="תעודת טכנאי">
+    <div class="wrap card-row">
+      <TechCard />
+      <div>
+        <h2 class="mb">בקשו לראות תעודה. תמיד.</h2>
+        <p>מנעולן מקבל גישה לבית שלכם. זה בסדר לגמרי לבקש ממנו להזדהות, לצלם את התעודה, ולבדוק שהשם תואם לעסק שהתקשרתם אליו. מנעולן רציני לא ייעלב.</p>
+        <p class="muted small">המדריך עודכן ב-{formatDate(site.contentUpdated)}.</p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="רוצים מנעולן שעומד בכל הסעיפים?" />
+</BaseLayout>
+
+<style>
+  .mb { margin-bottom: var(--s-5); }
+  .flags { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--s-5); }
+  .flags li { background: var(--c-card); border: 1px solid var(--c-line); border-top: 4px solid var(--c-alert); border-radius: var(--radius); padding: var(--s-5); display: grid; gap: var(--s-2); align-content: start; }
+  .ico { color: var(--c-alert); }
+  .flags p { color: var(--c-muted); font-size: 1rem; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-8); }
+  .ask { padding-inline-start: 1.4em; display: grid; gap: var(--s-3); font-weight: 600; }
+  .card-row { display: grid; grid-template-columns: auto 1fr; gap: var(--s-8); align-items: center; }
+  @media (max-width: 900px) { .two, .card-row { grid-template-columns: 1fr; gap: var(--s-7); } }
+</style>

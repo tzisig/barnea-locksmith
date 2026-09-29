@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import AreaEta from '../../components/AreaEta.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site, areas, contact, images } from '../../config/site.config';
+import { breadcrumbSchema, home } from '../../lib/schema';
+
+const crumbs = [home, { label: 'אזורי שירות', href: '/areas/' }];
+---
+<BaseLayout title="אזורי שירות: מנעולן בירושלים והסביבה" description={`${site.name} עובד בירושלים, מבשרת ציון, צור הדסה, בית שמש ומודיעין. זמני הגעה לכל אזור, ומה מיוחד בדלתות ובמנעולים בכל מקום.`} schema={[breadcrumbSchema(crumbs)]}>
+  <PageHero title="אזורי שירות" lead={`הרכב יוצא כל בוקר מ${contact.baseArea}. אלה האזורים שאנחנו מגיעים אליהם, עם זמן הגעה טיפוסי לכל אחד.`} crumbs={crumbs} image={images.jerusalem} imageAlt={images.jerusalemAlt} />
+  <section class="section night eta-sec">
+    <div class="wrap narrow-eta"><AreaEta /></div>
+  </section>
+  <section class="section">
+    <div class="wrap grid">
+      {areas.map((a) => (
+        <article class="area reveal">
+          <h2><a href={`/areas/${a.slug}/`}>מנעולן {a.nameIn}</a></h2>
+          <p class="eta">{a.eta.min}-{a.eta.max} דקות הגעה</p>
+          <p>{a.intro}</p>
+          <p class="hoods">{a.neighborhoods.slice(0, 6).join(', ')}{a.neighborhoods.length > 6 ? ' ועוד' : ''}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .eta-sec { border-top: 1px solid var(--c-night-line); }
+  .narrow-eta { max-width: 820px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s-6); }
+  .area { border-top: 3px solid var(--c-alert); padding-top: var(--s-4); display: grid; gap: var(--s-3); align-content: start; }
+  .area h2 { font-size: var(--t-h3); }
+  .area h2 a { color: var(--c-ink); }
+  .eta { font-weight: 800; color: var(--c-signal); }
+  .hoods { font-size: 0.9375rem; color: var(--c-muted); }
+</style>
